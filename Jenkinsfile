@@ -12,7 +12,7 @@ pipeline {
             }
         }
 
-        stage('npm install') {
+        stage('npm install'){
             steps {
                  
                 sh '''
