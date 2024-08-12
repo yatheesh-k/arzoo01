@@ -28,11 +28,14 @@ pipeline {
                 sh 'npm run build'
             }
         }
-        stage('Zip Dist Directory') {
+        //stage('Zip Dist Directory') {
+          //  steps {
+            //    sh '''
+              //  zip -r dist-${BUILD_ID}.zip dist
+                //'''
+         stage('Build') {
             steps {
-                sh '''
-                zip -r dist-${BUILD_ID}.zip dist
-                '''
+                sh 'mvn -B -DskipTests clean package'
             }
         }
         stage('SonarQube analysis') {
