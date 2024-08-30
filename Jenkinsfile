@@ -41,34 +41,31 @@ pipeline {
             }
             steps {
             withSonarQubeEnv('sonar') {
-                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=react-application -Dsonar.sources=src -Dsonar.host.url=http://13.127.192.36:9000/ -Dsonar.login=sqp_3cf78ef11a74f81d85e989d7865ee0c76f468321"
+                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=react-application -Dsonar.sources=src -Dsonar.host.url=http://13.232.115.201:9000/-Dsonar.login=sqp_3cf78ef11a74f81d85e989d7865ee0c76f468321"
                 }
             }
         }
-        stage('Upload Artifacts to Nexus') {
+       stage('Upload Artifact') {
             steps {
-                withCredentials([usernamePassword(credentialsId: env.NEXUS_CREDENTIALS_ID, passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-                    script {
-                        def file = "dist-${env.BUILD_ID}.zip"
-                        // Upload the file using HTTP Request Plugin
-                        httpRequest(
-                            httpMode: 'PUT',
-                            acceptType: 'APPLICATION_JSON',
-                            contentType: 'APPLICATION_OCTETSTREAM',
-                            consoleLogResponseBody: true,
-                            url: "${env.NEXUS_URL}${file}",
-                            authentication: 'nexus',
-                            requestBody: readFile(file)
-                        )
-                        sh 'rm -rf dist-${BUILD_ID}.zip'
-                    }
-                   
-                }
-               
-            }
-        }
-    }
-
+               script {
+                   nexusArtifactUploader(
+                       nexusVersion: 'nexus3',
+                       protocol: 'http',
+                       nexusUrl: 'http://13.232.246.255:8081/',
+                       version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                       groupId: 'com.demo1.www',
+                       repository: 'javaappl',
+                       credentialsId: 'nexuslogin',
+                       artifacts: [
+                         [artifactId: 'javaappl',
+                           classifier: '',
+                           file: 'target/practise1.war',
+                           type: 'war']
+                       ]
+                   )
+               }
+           }
+   }
 
     post {
         always {
